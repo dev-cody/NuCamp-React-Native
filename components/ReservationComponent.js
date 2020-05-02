@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, Picker, Switch, Button, StyleSheet, Modal } from "react-native";
+import { Text, View, ScrollView, Picker, Switch, StyleSheet, Modal } from "react-native";
+import { Button } from 'react-native-elements'
 import DatePicker from 'react-native-datepicker';
 
 class Reservation extends Component {
@@ -92,6 +93,7 @@ class Reservation extends Component {
                 <View style={styles.formRow}>
                     <Button
                         onPress={() => this.HandleReservation()}
+                        buttonStyle={styles.button}
                         title='Search'
                         color='#495636'
                         accessibilityLabel='Tap me to search for an available campsites to reserve'
@@ -115,6 +117,7 @@ class Reservation extends Component {
                             }}
                             color='#495636'
                             title='Close'
+                            buttonStyle={styles.button}
                         />
                     </View>
                 </Modal>
@@ -155,6 +158,9 @@ const styles = StyleSheet.create({
     modalText: {
         fontSize: 18,
         margin: 10
+    },
+    button: {
+        backgroundColor: '#495636',
     }
 })
 
