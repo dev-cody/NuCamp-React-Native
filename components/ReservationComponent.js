@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, Picker, Switch, StyleSheet, Modal } from "react-native";
+import { Text, View, Picker, Switch, StyleSheet, Animated, Alert } from "react-native";
 import { Button } from 'react-native-elements'
 import DatePicker from 'react-native-datepicker';
 
@@ -12,7 +12,7 @@ class Reservation extends Component {
             campers: 1,
             hikIn: false,
             date: '',
-            showModal: false
+            scaleValue: new Animated.Value(0)
         };
     }
 
@@ -20,13 +20,26 @@ class Reservation extends Component {
         title: 'Reserve Campsite'
     }
 
-    toggleModal() {
-        this.setState({showModal: !this.state.showModal});
-    }
-
     HandleReservation() {
         console.log(JSON.stringify(this.state));
-        this.toggleModal();
+        Alert.alert(
+            'Begin Search?',
+            'Number of Campers: ' + this.state.campers + '\n'
+            + 'Hike-In: ' + this.state.hikIn + '\n'
+            + 'Date: ' + this.state.date + '\n',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => this.resetForm(),
+                    style: 'cancel'
+                },
+                {
+                    text: 'Search',
+                    onPress: () => this.resetForm()
+                }
+            ],
+            { cancelable: false }
+            )
     }
 
     resetForm() {
@@ -34,14 +47,28 @@ class Reservation extends Component {
             campers: 1,
             hikeIn: false,
             date: '',
-            showModal: false
+            showModal: false,
         });
     }
 
+    animate() {
+        Animated.timing (
+            this.state.scaleValue,
+            {
+                toValue: 1,
+                duration: 750,
+                delay: 500
+            }
+        ).start();
+    }
+
+    componentDidMount() {
+        this.animate();
+    }
 
     render() {
         return(
-            <ScrollView>
+            <Animated.ScrollView style={{transform: [{scale: this.state.scaleValue}]}}>
                 <View style={styles.formRow}>
                     <Text style={styles.formLabel}>Number of Campers</Text>
                     <Picker
@@ -99,29 +126,7 @@ class Reservation extends Component {
                         accessibilityLabel='Tap me to search for an available campsites to reserve'
                     />
                 </View>
-                <Modal
-                    animationType={'slide'}
-                    transparent={false}
-                    visible={this.state.showModal}
-                    onRequestClose={() => this.toggleModal()}
-                    style={{paddingTop: Platform.OS === 'ios' ? 0 : Expo.Constants.statusBarHeight}}>
-                    <View style={styles.modal}>
-                        <Text style={styles.modalTitle}>Search Campsite Reservations</Text>
-                        <Text style={styles.modalText}>Number of Campers: {this.state.campers}</Text>
-                        <Text style={styles.modalText}>Hike-In?: {this.state.hikeIn ? 'Yes' : 'No'}</Text>
-                        <Text style={styles.modalText}>Date: {this.state.date}</Text>
-                        <Button
-                            onPress={() => {
-                                this.toggleModal();
-                                this.resetForm();
-                            }}
-                            color='#495636'
-                            title='Close'
-                            buttonStyle={styles.button}
-                        />
-                    </View>
-                </Modal>
-            </ScrollView>
+            </Animated.ScrollView>
         );
     }
 
@@ -142,22 +147,6 @@ const styles = StyleSheet.create({
     },
     formItem: {
         flex: 1
-    },
-    modal: {
-        justifyContent: 'center',
-        margin: 20,
-    }, 
-    modalTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        backgroundColor: '#495636',
-        textAlign: 'center',
-        color: '#fff',
-        marginBottom: 20,
-    },
-    modalText: {
-        fontSize: 18,
-        margin: 10
     },
     button: {
         backgroundColor: '#495636',
